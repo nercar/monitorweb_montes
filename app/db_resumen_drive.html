@@ -1,0 +1,146 @@
+<!-- Main row -->
+<div class="row h-100">
+	<div class="col-md-12 col-sm-12 p-0 m-0 mt-2">
+		<div class="row align-items-baseline ml-2 mr-2">
+			<label for="buscar">Buscar:</label>
+			<input type="text" class="form-control col p-1"
+				id="buscar" value="" placeholder="Buscar en la Lista...">
+			<div class="col-1"></div>
+			<div class="input-group input-daterange ml-auto date gfechas align-items-center col-4" id="fechas">
+				<div class="input-group-addon font-weight-normal m-1">Del</div>
+				<input type="text" data-id="fechai" class="form-control rounded p-1"
+					autocomplete="off" data-inputmask="'alias': 'dd-mm-yyyy'" data-mask placeholder="dd-mm-yyyy"
+					onblur="if(this.value=='') $(this).datepicker('setDate', moment().subtract(2, 'weeks').startOf('week').format('DD-MM-YYYY'));">
+				<div class="input-group-addon font-weight-normal m-1">Al</div>
+				<input type="text" data-id="fechaf" class="form-control rounded p-1"
+					autocomplete="off" data-inputmask="'alias': 'dd-mm-yyyy'" data-mask placeholder="dd-mm-yyyy"
+					onblur="if(this.value=='') $(this).datepicker('setDate', moment().subtract(2, 'weeks').endOf('week').format('DD-MM-YYYY'));">
+			</div>
+			<button class="btn btn-success p-1 pl-2 pr-2" disabled id="btnExport">
+				<i class="fas fa-file-excel"></i> Exportar a Excel
+			</button>
+		</div>
+	</div>
+	<div class="col-md-12 col-sm-12 mt-2">
+		<div class="card card-primary elevation-2 border border-dark">
+			<div class="card-header d-flex p-0 pl-2 align-items-baseline">
+				<span id="ttitulo" class="mr-auto"><i class="fas fa-file-invoice-dollar"></i> Resumen de Driver's Realizados por Ventas OnLine</span>
+			</div>
+			<div class="card-body p-0 m-0">
+				<table id="lstDrives" class="table-striped table-hover table-bordered" width="100%">
+					<thead class="bg-dark-gradient">
+						<tr>
+							<th width="10%" class="text-center">#Factura</th>
+							<th width="15%" class="text-center">Monto Fact.</th>
+							<th width="30%" class="text-center">Dirección Clte.</th>
+							<th width="10%" class="text-center">Fecha Drive</th>
+							<th width="25%" class="text-center">Realizado Por</th>
+							<th width="10%" class="text-center">Monto Domicilio</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<!-- /.card-body -->
+		</div>
+		<!-- /.col -->
+	</div>
+	<!-- /.col -->
+</div>
+<!-- /.row (main row 2) -->
+
+<script>
+	$('.modal').modal({backdrop: 'static', keyboard: false, show: false})
+
+	$('#fechas').datepicker({
+		format: "dd-mm-yyyy",
+		todayBtn: "linked",
+		language: "es",
+		autoclose: true,
+		todayHighlight: true,
+		endDate: "0d",
+	});
+	
+	$('.input-daterange input').each(function() {
+		if($(this).data('id') == 'fechai')
+			$(this).datepicker("setDate", moment().startOf('month').format('DD-MM-YYYY'));
+		if($(this).data('id') == 'fechaf')
+			$(this).datepicker("setDate", moment().format('DD-MM-YYYY'));
+	});
+
+	$('[data-mask]').inputmask();
+
+	var fechas = [];
+	$('.input-daterange input').each(function() {
+		fechas.push(moment($(this).datepicker().val(), 'DD-MM-YYYY').format('YYYY-MM-DD'))
+	});
+
+	$('#fechas').on('change', function() {
+		$('#btnExport').attr('disabled', true)
+		$('#lstDrives').DataTable().ajax.reload( null, false );
+	})
+
+	$('#btnExport').on('click', function (){
+		// se dispara el evento export del boton oculto del datatable
+		$('#lstDrives').DataTable().button( '0' ).trigger();
+	})
+
+	$('#lstDrives').dataTable( {
+		scrollY: '67vh',
+		scrollCollapse: false,
+		autoWidth: false,
+		searching: true,
+		processing: false,
+		ordering: false,
+		buttons: [{
+			extend: 'excelHtml5',
+			autoFilter: true,
+			exportOptions: {
+				format: {
+					body: function(data, row, column, node) {
+							if( column == 1 || column == 5 ) {
+								data = data.replace(',', '');
+							} else {
+								data = '\u200C'+data;
+							}
+							return data;
+					}
+				}
+			},
+			title: 'Resumen de Driver\'s Realizados del ' + 
+					$('#fechas').data('datepicker').inputs[0].value + ' al ' +
+					$('#fechas').data('datepicker').inputs[1].value,
+			filename: 'MonitorWebDrivers',
+			sheetName: 'MonitorWebDrivers',
+		}],
+		ajax: {
+			url: "app/DBProcs.php",
+			data: {
+				opcion: "lstDrives",
+				fdesde: function() {
+					return moment($('#fechas').data('datepicker').inputs[0].value, 'DD-MM-YYYY').format('YYYY-MM-DD')
+				},
+				fhasta: function() {
+					return moment($('#fechas').data('datepicker').inputs[1].value, 'DD-MM-YYYY').format('YYYY-MM-DD')
+				},
+			},
+			type: "POST",
+			dataType: "json",
+		},
+		columns: [
+			{ data: 'nrofac', sClass: "text-left  align-middle" },
+			{ data: 'montof', sClass: "text-right align-middle" },
+			{ data: 'dircte', sClass: "text-left  align-middle" },
+			{ data: 'fechad', sClass: "text-left  align-middle" },
+			{ data: 'driver', sClass: "text-left  align-middle" },
+			{ data: 'montod', sClass: "text-right  align-middle" },
+		],
+		drawCallback: function(settings) {
+			$('#btnExport').attr('disabled', this.api().rows().data()['length']==0)
+		}
+	})
+
+	$("#buscar").keyup(function() {
+		// Buscar en la tabla
+		$('#lstDrives').dataTable().fnFilter(this.value);
+	});
+</script>

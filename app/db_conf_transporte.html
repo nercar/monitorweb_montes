@@ -1,0 +1,404 @@
+<!-- Main row -->
+<div class="row h-100">
+	<!-- Lista de usuarios -->
+	<div class="col-md-12 col-sm-12 p-0 m-0 mt-2">
+		<div class="row align-items-baseline justify-content-center ml-2 mr-2">
+			<label for="buscar">Buscar: </label>
+			<input type="text" class="form-control form-control-sm m-0 col" id="buscar"
+				value="" placeholder="Buscar en la Lista...">
+			<div class="col-1"></div>
+			<button class="btn btn-primary p-1 pl-2 pr-2" id="nvoRegistro">
+				<i class="fas fa-plus-circle"></i> Nuevo Registro
+			</button>
+			<button class="btn btn-success ml-1 p-1 pl-2 pr-2" id="btnExport">
+				<i class="fas fa-file-excel"></i> Exportar Listado
+			</button>
+		</div>
+	</div>
+	<div class="col-md-12 col-sm-12 mt-2">
+		<div class="card card-primary elevation-2 border border-dark">
+			<div class="card-header d-flex p-0 pl-2 align-items-baseline">
+				<span id="ttitulo" class="mr-auto"><i class="fas fa-users"></i>Listado de Transportistas del Ventas OnLine</span>
+				<div class="bg-warning pl-2 pr-2 rounded border border-dark">
+					<div class="custom-control custom-checkbox my-0" style="top: 0; letter-spacing: -0.5px;">
+						<input type="checkbox" class="custom-control-input" id="todo"
+							onclick="$('#listadoTrans').DataTable().ajax.reload( null, false );">
+						<label class="custom-control-label" for="todo">Ver Eliminados</label>
+					</div>
+				</div>
+			</div>
+			<div class="card-body p-0 m-0">
+				<table id="listadoTrans" cellpadding="0" cellspacing="0"
+						class="table-striped table-hover w-100">
+					<thead class="bg-dark-gradient">
+						<tr>
+							<th width="15%" class="text-center border border-top-0 border-bottom-0">Cédula</th>
+							<th width="45%" class="text-center border border-top-0 border-bottom-0">Nombre</th>
+							<th width="15%" class="text-center border border-top-0 border-bottom-0">Teléfono</th>
+							<th width="10%" class="text-center border border-top-0 border-bottom-0">Placa</th>
+							<th width="15%" class="text-center border border-top-0 border-bottom-0">Opciones</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<!-- /.card-body -->
+		</div>
+		<!-- /.col -->
+	</div>
+	<!-- /.col -->
+</div>
+<!-- /.row (main row 2) -->
+
+<!-- Modal -->
+<div class="modal fade" id="datosTrans" style="z-index: 9999" tabindex="-1" role="dialog" aria-labelledby="datosTransLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered w-100" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-primary pb-0 pt-0 pr-0">
+				<h5 class="modal-title font-weight-bold" id="mtitulo"></h5>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-danger btn-lg float-right">
+					<span class="fas fa-window-close float-right" aria-hidden="true"></span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table class="col-12 table">
+					<tr>
+						<th>(*) Cédula</th>
+						<td>
+							<div class="input-group">
+								<span class="input-group-addon p-1 pl-2 pr-2 bg-info">
+									<i class="text-center align-middle fas fa-id-card"
+									style="width: 20px;"></i>
+								</span>
+								<input id="cedula" onfocus="this.select();" type="text"
+									class="input-control form-control"
+									placeholder="Cédula" autocomplete="off">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>(*) Nombre</th>
+						<td>
+							<div class="input-group">
+								<span class="input-group-addon p-1 pl-2 pr-2 bg-info">
+									<i class="text-center align-middle fas fa-address-card"
+										style="width: 20px;"></i>
+								</span>
+								<input id="nombre" onfocus="this.select();" type="text"
+									class="input-control form-control"
+									placeholder="Nombre Completo" autocomplete="off">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>(*) Teléfono</th>
+						<td>
+							<div class="input-group">
+								<span class="input-group-addon p-1 pl-2 pr-2 bg-info">
+									<i class="text-center align-middle fas fa-phone-alt"
+										style="width: 20px;"></i>
+								</span>
+								<input id="telefono" onfocus="this.select();" type="text"
+									class="input-control form-control" 
+									placeholder="Teléfono" autocomplete="off">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>(*) Placa Vehículo</th>
+						<td>
+							<div class="input-group">
+								<span class="input-group-addon p-1 pl-2 pr-2 bg-info">
+									<i class="text-center align-middle fas fa-motorcycle"
+										style="width: 20px;"></i>
+								</span>
+								<input id="placa" onfocus="this.select();" type="text"
+									class="input-control form-control"
+									placeholder="Placa del vehículo" autocomplete="off">
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div class="col-12 text-center">(*) Son datos obligatorios</div>
+			</div>
+			<!-- /.col -->
+			<div class="modal-footer bg-light border-dark py-1">
+				<span class="badge badge-danger w-100 py-2 elevation-2 border border-light" id="fmensaje"></span>
+				<div class="m-1">
+					<button id="fcancelar" class="btn btn-outline-danger" data-dismiss="modal">
+						Cancelar&nbsp;&nbsp;<i class="text-center align-middle fas fa-sign-out-alt" style="width: 20px;"></i>
+					</button>
+				</div>
+				<div class="m-1">
+					<button id="faceptar" class="btn btn-success" onclick="guardarTrans()">
+						Aceptar&nbsp;&nbsp;<i class="text-center align-middle fas fa-check-circle" style="width: 20px;"></i>
+					</button>
+				</div>
+				<!-- /.col -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var editar = 0;
+	$('.modal').modal({backdrop: 'static', keyboard: false, show: false})
+
+	if($('#movil').val()==1) {
+		$("html, body").animate({ scrollTop: 0 }, "slow");
+	}
+
+	$('#nvoRegistro').on('click', function (){
+		// editar = 0 -> crea un usuario nuevo
+		editar = 0;
+		$('#cedula').val('');
+		$('#nombre').val('')
+		$('#telefono').val('');
+		$('#placa').val('');
+		$('#mtitulo').html('Registrar Nuevo Transportista');
+		$('#datosTrans').modal('show');
+	})
+
+	$('#listadoTrans').dataTable( {
+		scrollY: ($('#movil').val()==1)?'64vh':'67vh',
+		scrollCollapse: false,
+		autoWidth: false,
+		searching: true,
+		processing: false,
+		ordering: false,
+		buttons: [{
+			extend: 'excelHtml5',
+			autoFilter: true,
+			title: 'Transportistas Registrados para Ventas OnLine',
+			filename: 'MonitorWebTrans',
+			sheetName: 'Transportistas MonitorWeb',
+			exportOptions: {
+				columns: [ 0, 1, 2, 3 ],
+				format: {
+					body: function(data, row, column, node) {
+							data = '\u200C'+$('<p>' + data + '</p>').text();
+							return data;
+					}
+				}
+			}
+		}],
+		ajax: {
+			url: "app/DBProcs.php",
+			data: {
+				opcion: "listadoTrans",
+				idpara: function() { 
+					if($('#todo').prop('checked')) {
+						return '>=0'
+					} else {
+						return '=0'
+					}
+				},
+			},
+			type: "POST",
+			dataType: "json",
+		},
+		columns: [
+			{ data: 'cedula',  sClass: "text-left align-middle" },
+			{ data: 'nombre',  sClass: "text-left align-middle" },
+			{ data: 'telefono',sClass: "text-left align-middle" },
+			{ data: 'placa',   sClass: "text-left align-middle" },
+			{ data: null,
+				render: function(data) {
+					disabled = (data.eliminado==1)?'disabled':'';
+					txt = ''+
+						'<button class="btn btn-sm btn-primary btnEditar" '+disabled+' title="Editar"><i class="fas fa-pencil-alt"></i></button>'+
+						'&nbsp;';
+					if(data.eliminado==1) {
+						txt += '<button class="btn btn-sm btn-success btnEliminar" title="Restaurar"><i class="fas fa-undo-alt"></i></button>';
+					} else {
+						txt += '<button class="btn btn-sm btn-danger btnEliminar" title="Eliminar"><i class="fas fa-trash"></i></button>';
+					}
+					return txt
+				},
+				sClass: "text-center align-middle not-export-col"
+			},
+		],
+		rowCallback: function( row, data, index ) {
+			if(data.eliminado==1) {
+				$(row).css({'text-decoration': 'line-through', 'font-style': 'italic', 'color': '#929292' }) 
+			}
+			if($('#movil').val()==1) {
+				var row = $('#listadoTrans').DataTable().row( row );
+				row.child( infoextra(data) ).show();
+				$(this).addClass('txtcomp');
+			}
+		},
+		initComplete: function() {
+			$('#listadoTrans').DataTable().columns([0,2,3]).visible( $('#movil').val()==0 ).draw( false, false );
+		},
+		drawCallback: function() {
+			$('#btnExport').attr('disabled', this.api().rows().data()['length']==0)
+		}
+	})
+
+	$("#buscar").keyup(function() {
+		// Buscar en la tabla
+		$('#listadoTrans').dataTable().fnFilter(this.value);
+	});
+
+	$('.input-control').keyup(function(e) {
+		if(e.which == 13 || e.which == 40) {
+			var index = $('.input-control').index(this) + 1;
+			$('.input-control').eq(index).focus();
+		} else if(e.which == 38) {
+			var index = $('.input-control').index(this) - 1;
+			if(index>=0) $('.input-control').eq(index).focus();
+		}
+		if($('#fmensaje').html().trim()!='') {
+			$('#fmensaje').html(null);
+		}
+	})
+
+	$('#listadoTrans tbody').on('click', 'tr button.btnEditar', function () {
+		var data = $('#listadoTrans').DataTable().row($(this).closest('tr')).data();
+		// editar = 0 -> crea un usuario nuevo
+		editar = 1;
+		$('#cedula').val(data.cedula);
+		$('#nombre').val(data.nombre)
+		$('#telefono').val(data.telefono);
+		$('#placa').val(data.placa);
+		$('#mtitulo').html('Editar Transportista <span class="badge badge-warning" id="idtrans">'+data.id+'</span>');
+		$('#datosTrans').modal('show');
+	});
+
+	$('#listadoTrans tbody').on('click', 'tr button.btnVer', function () {
+		var data = $('#listadoTrans').DataTable().row($(this).closest('tr')).data();
+		$.ajax({
+			url: "app/DBProcs.php",
+			data: {
+				opcion: "listar_viajes",
+				idpara: data.id
+			},
+			type: "POST",
+			dataType: "json",
+			success : function(data) {
+
+			}
+		})
+	});
+
+	$('#listadoTrans tbody').on('click', 'tr button.btnEliminar', function () {
+		var data = $('#listadoTrans').DataTable().row($(this).closest('tr')).data();
+		var eliminado = (data.eliminado=='1')?0:1;
+		eliminarTrans(data.id, eliminado);
+	});
+
+	$('#datosTrans').on('hidden.bs.modal', function () {
+		$('#fusuario, #cedula, #fclave, #fclavec').val('');
+		$('#fusuario').addClass('bg-secondary');
+		$('#fusuario').prop('readonly', true);
+		$('#fstatus').val(1);
+		$('#fcambiar').prop('checked', false);
+		$('#dfcambiar').removeClass('d-none');
+		$('#fclaves').addClass('d-none');
+		$('#fmensaje').html('');
+		$('#faceptar').removeClass('d-none');
+		$('#fmodulos').selectpicker('val', '');
+	});
+
+	$('#datosTrans').on('shown.bs.modal', function () {
+		setTimeout("$('#cedula').focus()",100);
+	});
+
+	function guardarTrans() {
+		// editar = 1 -> edita los datos del usuario
+		// editar = 0 -> crea un usuario nuevo
+		var guardar = 1; // 1 indica si guardar 0 = no guardar
+
+		if($('#cedula').val().trim()   == '') {
+			guardar = 10;
+			msj = 'Ingrese el dato Cedula';
+			control = '#cedula';
+		} else if($('#nombre').val().trim()   == '') {
+			guardar = 11;
+			msj = 'Ingrese el dato Nombre';
+			control = '#nombre';
+		} else if($('#telefono').val().trim() == '') {
+			guardar = 12;
+			msj = 'Ingrese el dato Telefono';
+			control = '#telefono';
+		} else if($('#placa').val().trim()    == '') {
+			guardar = 13;
+			msj = 'Ingrese el dato Placa';
+			control = '#placa';
+		}
+
+		if(guardar==1) {
+			$.ajax( {
+				data: {
+					opcion: (editar==1) ? "editar_trans" : "nuevo_trans",
+					cedula: $('#cedula').val().trim(),
+					nombre: $('#nombre').val().trim(),
+					telefo: $('#telefono').val().trim(),
+					placas: $('#placa').val().trim(),
+					idpara: (editar==1) ? $('#idtrans').html() : '',
+				},
+				type: "POST",
+				dataType: "text",
+				url: "app/DBProcs.php",
+				success : function(data) {
+					var datos = data.split('¬');
+					if(datos[0]=='1') { 
+						$('#datosTrans').modal('hide');
+						$('#listadoTrans').DataTable().ajax.reload( null, false );
+					} else {
+						msg.fire({
+							title: '!!! A T E N C I Ó N ¡¡¡',
+							icon: 'error',
+							html: datos[1],
+							showCancelButton: false,
+						})
+					}
+				}
+			});
+		} else {
+			$('#fmensaje').html(msj);
+			setTimeout("$(control).focus().select()", 150);
+		}
+	}
+
+	function eliminarTrans(idtrans, eliminado) {
+		$.ajax( {
+			data: {
+				opcion: "eliminar_trans",
+				idpara: idtrans,
+				status: eliminado,
+			},
+			type: "POST",
+			dataType: "text",
+			url: "app/DBProcs.php",
+			success : function(data) {
+				data = data.split('¬');
+				if(data[0]==1) {
+					$('#listadoTrans').DataTable().ajax.reload( null, false );
+				} else {
+					msg.fire({
+						title: '!!! A T E N C I Ó N ¡¡¡',
+						icon: 'error',
+						html: data[1],
+						showCancelButton: false,
+					})
+				}
+			},
+		})
+	}
+
+	function infoextra(d) {
+		var ret = '<span style="display: none;">'+d.id+'</span><span class="mbadge">'+
+					'<b>Cédula: </b>'+d.cedula+'&emsp;'+
+					'<b>Telefono: </b>'+d.telefono+'&emsp;'+
+					'<b>Placa: </b>'+d.placa+'&emsp;'+
+				  '</span>';
+		return ret;
+	}
+
+	$('#btnExport').on('click', function (){
+		// se dispara el evento export del boton oculto del datatable
+		$('#listadoTrans').DataTable().button( '0' ).trigger();
+	})
+</script>
